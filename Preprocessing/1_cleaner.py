@@ -3,23 +3,63 @@ import os
 from datetime import datetime
 import string
 import re
+import nltk
+from nltk.corpus import stopwords
+
+# === INITIAL SETUP ===
+nltk.download("stopwords")
+stop_words = set(stopwords.words("english"))
 
 # === CONFIG ===
 INPUT_FILE = "news_data/all_articles.json"
 OUTPUT_FILE = "news_data/all_articles_cleaned.json"
 REMOVED_FILE = "news_data/removed_articles.json"
+REFERENCE_DATE = datetime.strptime("2025-05-12", "%Y-%m-%d")
 EXPECTED_COLUMNS = [
     "source", "url", "date", "time",
     "title", "body", "clean_body",
     "summary", "keywords", "image_url", "t"
 ]
-REFERENCE_DATE = datetime.strptime("2025-05-12", "%Y-%m-%d")
+GENERIC_TITLES = {
+    "the guardian", "bbc", "bbc news", "cnn", "reuters", "al jazeera",
+    "dw", "euronews", "new york times", "ny times", "nyt", "abc news",
+    "npr", "fox news", "nbc", "cbs", "the independent", "the times",
+    "home", "news", "top news", "breaking news", "latest news",
+    "world news", "opinion", "politics", "contact us", "about us",
+    "archives", "read more", "sections", "sport", "culture",
+    "editorial", "editor’s pick", "top stories", "features",
+    "headline", "headlines", "front page", "latest", "unknown", ""
+}
+NOISE_PHRASES = [
+    "sign up", "subscribe", "newsletter promotion", "enter your email",
+    "get the latest", "breaking news alerts", "privacy notice", "privacy policy",
+    "cookie policy", "terms of service", "use google recaptcha", "sponsored content",
+    "follow us", "skip past", "see our", "watch the full story",
+    "more from this section", "you might also like", "share this article"
+]
+
+# === UTILS ===
+def clean_scraping_noise_with_location(text, noise_phrases=NOISE_PHRASES, location_cutoff=0.3):
+    lines = text.splitlines()
+    total_lines = len(lines)
+    start_index = int(total_lines * (1 - location_cutoff))
+    for i in range(start_index, total_lines):
+        line = lines[i].lower()
+        if any(phrase in line for phrase in noise_phrases):
+            return '\n'.join(lines[:i]).strip()
+    return text.strip()
 
 def clean_text(text):
     text = text.lower()
     text = text.translate(str.maketrans('', '', string.punctuation))
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
+
+def remove_stopwords(text):
+    return ' '.join(word for word in text.split() if word not in stop_words)
+
+def is_too_short(text, min_words=50):
+    return len(text.strip().split()) < min_words
 
 # === LOAD DATA ===
 with open(INPUT_FILE, 'r') as f:
@@ -32,10 +72,11 @@ cleaned_articles = {}
 removed_articles = {}
 removed_unknown = 0
 removed_invalid_time = 0
+removed_too_short = 0
+removed_generic_title = 0
 fixed_missing_columns = 0
 recalculated_t = 0
 duplicates_removed = 0
-clean_body_created = 0
 seen_keys = set()
 
 for url, article in articles.items():
@@ -70,16 +111,38 @@ for url, article in articles.items():
         if col not in article:
             if col == "keywords":
                 article[col] = []
-            elif col == "clean_body":
-                body_text = article.get("body", "")
-                article["clean_body"] = clean_text(body_text)
-                clean_body_created += 1
             else:
                 article[col] = ""
             fixed_missing_columns += 1
 
-    # === Deduplicate ===
-    key = (article.get("title", "").strip(), article.get("clean_body", "").strip())
+    # === Noise Removal from body
+    raw_body = article.get("body", "")
+    filtered_body = clean_scraping_noise_with_location(raw_body)
+    article["body_filtered"] = filtered_body
+
+    # === Filter: Too short?
+    if is_too_short(filtered_body):
+        article["remove_reason"] = "too_short"
+        removed_articles[url] = article
+        removed_too_short += 1
+        continue
+
+    # === Filter: Generic or meaningless title?
+    title = article.get("title", "").lower().strip()
+    if title in GENERIC_TITLES:
+        article["remove_reason"] = "generic_title"
+        removed_articles[url] = article
+        removed_generic_title += 1
+        continue
+
+    # === Preprocess text fields
+    article["clean_body"] = clean_text(filtered_body)
+    article["clean_body_nostop"] = remove_stopwords(article["clean_body"])
+    article["title_nostop"] = remove_stopwords(title)
+    article["summary_nostop"] = remove_stopwords(article.get("summary", "").lower())
+
+    # === Deduplicate AFTER cleaning (best practice)
+    key = (article["title"].strip(), article["clean_body"])
     if key not in seen_keys:
         seen_keys.add(key)
         cleaned_articles[url] = article
@@ -100,15 +163,12 @@ with open(OUTPUT_FILE, 'w') as f:
 with open(REMOVED_FILE, 'w') as f:
     json.dump(removed_articles, f, indent=2)
 
-# === PRINT SUMMARY ===
+# === PRINT SUMMARY (Simplified) ===
 print("\n🧾 CLEANING SUMMARY")
-print(f"✅ Total articles loaded             : {len(articles)}")
-print(f"🗑️  Articles removed (unknown date)   : {removed_unknown}")
-print(f"🗑️  Articles removed (00:00:00 time) : {removed_invalid_time}")
-print(f"🧼 Missing columns filled            : {fixed_missing_columns}")
-print(f"🧪 'clean_body' created               : {clean_body_created}")
-print(f"📆 Recalculated 't' values           : {recalculated_t}")
-print(f"🧹 Duplicate articles removed        : {duplicates_removed}")
-print(f"📦 Final cleaned & sorted articles  : {len(sorted_articles)}")
-print(f"💾 Saved cleaned file to            : {OUTPUT_FILE}")
-print(f"💾 Removed articles saved to        : {REMOVED_FILE}")
+print(f"📄 Loaded articles               : {len(articles)}")
+print(f"✅ Articles kept                : {len(sorted_articles)}")
+print(f"🗑️  Removed: missing/invalid date : {removed_unknown + removed_invalid_time}")
+print(f"🗑️  Removed: too short content     : {removed_too_short}")
+print(f"🗑️  Removed: generic title         : {removed_generic_title}")
+print(f"🧹 Removed duplicates             : {duplicates_removed}")
+print(f"💾 Saved cleaned data to         : {OUTPUT_FILE}")
