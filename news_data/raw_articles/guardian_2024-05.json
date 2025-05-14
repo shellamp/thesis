@@ -1,0 +1,77 @@
+{
+  "https://www.theguardian.com/technology/email": {
+    "source": "The Guardian",
+    "url": "https://www.theguardian.com/technology/email",
+    "date": "2024-05-17",
+    "time": "00:00:00",
+    "title": "The Guardian",
+    "body": "Scam email saying that the actor was in a fix and needed cash was sent to contacts including Jamie Dornan \u2013 Beatty was the only one to come to his aid",
+    "clean_body": "scam email saying that the actor was in a fix and needed cash was sent to contacts including jamie dornan \u2013 beatty was the only one to come to his aid",
+    "summary": "Scam email saying that the actor was in a fix and needed cash was sent to contacts including Jamie Dornan \u2013 Beatty was the only one to come to his aid",
+    "keywords": [
+      "dornan",
+      "guardian",
+      "sent",
+      "jamie",
+      "needed",
+      "including",
+      "saying",
+      "fix",
+      "email",
+      "scam",
+      "contacts"
+    ],
+    "image_url": "https://assets.guim.co.uk/static/frontend/icons/homescreen/apple-touch-icon.svg"
+  },
+  "https://www.theguardian.com/fashion/gucci": {
+    "source": "The Guardian",
+    "url": "https://www.theguardian.com/fashion/gucci",
+    "date": "2024-05-14",
+    "time": "00:00:00",
+    "title": "The Guardian",
+    "body": "Despite Milan playing it safe with designers doubling down on their signature styles there was fun to be had with inspiration coming from Princess Anne, the Atlantic ocean and Eyes Wide Shut",
+    "clean_body": "despite milan playing it safe with designers doubling down on their signature styles there was fun to be had with inspiration coming from princess anne the atlantic ocean and eyes wide shut",
+    "summary": "Despite Milan playing it safe with designers doubling down on their signature styles there was fun to be had with inspiration coming from Princess Anne, the Atlantic ocean and Eyes Wide Shut",
+    "keywords": [
+      "playing",
+      "guardian",
+      "princess",
+      "safe",
+      "ocean",
+      "styles",
+      "inspiration",
+      "shut",
+      "wide",
+      "signature",
+      "milan"
+    ],
+    "image_url": "https://assets.guim.co.uk/static/frontend/icons/homescreen/apple-touch-icon.svg"
+  },
+  "https://www.theguardian.com/politics/dup": {
+    "source": "The Guardian",
+    "url": "https://www.theguardian.com/politics/dup",
+    "date": "2024-05-23",
+    "time": "00:00:00",
+    "title": "Democratic Unionist party (DUP)",
+    "body": "Editorial: There are only 18 seats at stake in the province this week, but the next UK government has a big political task on its hands there",
+    "clean_body": "editorial there are only 18 seats at stake in the province this week but the next uk government has a big political task on its hands there",
+    "summary": "Editorial: There are only 18 seats at stake in the province this week, but the next UK government has a big political task on its hands there",
+    "keywords": [
+      "democratic",
+      "party",
+      "political",
+      "stake",
+      "seats",
+      "big",
+      "task",
+      "province",
+      "hands",
+      "week",
+      "dup",
+      "uk",
+      "editorial",
+      "unionist"
+    ],
+    "image_url": "https://assets.guim.co.uk/static/frontend/icons/homescreen/apple-touch-icon.svg"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "https://www.theguardian.com/world/g7": {
+    "source": "The Guardian",
+    "url": "https://www.theguardian.com/world/g7",
+    "date": "2025-02-24",
+    "time": "00:00:00",
+    "title": "The Guardian",
+    "body": "The Italian prime minister also stated the EU will not directly contribute to a $50bn loan to Ukraine agreed at the summit",
+    "clean_body": "the italian prime minister also stated the eu will not directly contribute to a 50bn loan to ukraine agreed at the summit",
+    "summary": "The Italian prime minister also stated the EU will not directly contribute to a $50bn loan to Ukraine agreed at the summit",
+    "keywords": [
+      "contribute",
+      "directly",
+      "guardian",
+      "loan",
+      "summit",
+      "stated",
+      "ukraine",
+      "italian",
+      "prime",
+      "minister",
+      "eu"
+    ],
+    "image_url": "https://assets.guim.co.uk/static/frontend/icons/homescreen/apple-touch-icon.svg"
+  }
+}
